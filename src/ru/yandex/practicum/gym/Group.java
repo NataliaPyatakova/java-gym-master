@@ -14,15 +14,8 @@ public class Group {
         this.duration = duration;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public Age getAge() {
-        return age;
-    }
-
-    public int getDuration() {
-        return duration;
+    @Override
+    public String toString() {
+        return title + " " + age + " " + duration;
     }
 }
