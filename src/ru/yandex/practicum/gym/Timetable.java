@@ -13,12 +13,23 @@ public class Timetable {
     }
 
     public TreeMap<TimeOfDay, ArrayList<TrainingSession>> getTrainingSessionsForDay(DayOfWeek dayOfWeek) {
-        return timetable.computeIfAbsent(dayOfWeek, k -> new TreeMap<>());
+        TreeMap<TimeOfDay, ArrayList<TrainingSession>> trainingSessionTreeMap;
+        if (timetable.containsKey(dayOfWeek)) {
+            trainingSessionTreeMap = timetable.get(dayOfWeek);
+        } else {
+            trainingSessionTreeMap = new TreeMap<>();
+        }
+        return trainingSessionTreeMap;
     }
 
     public ArrayList<TrainingSession> getTrainingSessionsForDayAndTime(DayOfWeek dayOfWeek, TimeOfDay timeOfDay) {
-        TreeMap<TimeOfDay, ArrayList<TrainingSession>> trainingsForDay = timetable.computeIfAbsent(dayOfWeek, k -> new TreeMap<>());
-        return trainingsForDay.computeIfAbsent(timeOfDay, k -> new ArrayList<>());
+        ArrayList<TrainingSession> trainingSessionArrayList;
+        if (timetable.containsKey(dayOfWeek) && timetable.get(dayOfWeek).containsKey(timeOfDay)) {
+            trainingSessionArrayList = timetable.get(dayOfWeek).get(timeOfDay);
+        } else {
+            trainingSessionArrayList = new ArrayList<>();
+        }
+        return trainingSessionArrayList;
     }
 
     public void printTimetable() {
