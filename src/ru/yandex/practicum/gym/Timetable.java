@@ -7,39 +7,18 @@ public class Timetable {
     private final HashMap<DayOfWeek, TreeMap<TimeOfDay, ArrayList<TrainingSession>>> timetable = new HashMap<>();
 
     public void addNewTrainingSession(TrainingSession trainingSession) {
-        ArrayList<TrainingSession> trainingSessionArrayList;
-        TreeMap<TimeOfDay, ArrayList<TrainingSession>> trainingSessionTreeMap;
-        if (timetable.containsKey(trainingSession.getDayOfWeek())) {
-            trainingSessionTreeMap = timetable.get(trainingSession.getDayOfWeek());
-            if (trainingSessionTreeMap.containsKey(trainingSession.getTimeOfDay())) {
-                trainingSessionArrayList = trainingSessionTreeMap.get(trainingSession.getTimeOfDay());
-                trainingSessionArrayList.add(trainingSession);
-            } else {
-                trainingSessionArrayList = new ArrayList<>();
-                trainingSessionArrayList.add(trainingSession);
-                trainingSessionTreeMap.put(trainingSession.getTimeOfDay(), trainingSessionArrayList);
-            }
-        } else {
-            trainingSessionArrayList = new ArrayList<>();
-            trainingSessionArrayList.add(trainingSession);
-            trainingSessionTreeMap = new TreeMap<>();
-            trainingSessionTreeMap.put(trainingSession.getTimeOfDay(), trainingSessionArrayList);
-            timetable.put(trainingSession.getDayOfWeek(), trainingSessionTreeMap);
-        }
+        TreeMap<TimeOfDay, ArrayList<TrainingSession>> trainingsForDay = timetable.computeIfAbsent(trainingSession.getDayOfWeek(), k -> new TreeMap<>());
+        ArrayList<TrainingSession> sessions = trainingsForDay.computeIfAbsent(trainingSession.getTimeOfDay(), k -> new ArrayList<>());
+        sessions.add(trainingSession);
     }
 
     public TreeMap<TimeOfDay, ArrayList<TrainingSession>> getTrainingSessionsForDay(DayOfWeek dayOfWeek) {
-        return timetable.get(dayOfWeek);
+        return timetable.computeIfAbsent(dayOfWeek, k -> new TreeMap<>());
     }
 
     public ArrayList<TrainingSession> getTrainingSessionsForDayAndTime(DayOfWeek dayOfWeek, TimeOfDay timeOfDay) {
-        ArrayList<TrainingSession> trainingSessionArrayList;
-        if (timetable.containsKey(dayOfWeek)) {
-            trainingSessionArrayList = timetable.get(dayOfWeek).get(timeOfDay);
-        } else {
-            trainingSessionArrayList = null;  //если HashMap вообще пустая. то тут рвет
-        }
-        return trainingSessionArrayList;
+        TreeMap<TimeOfDay, ArrayList<TrainingSession>> trainingsForDay = timetable.computeIfAbsent(dayOfWeek, k -> new TreeMap<>());
+        return trainingsForDay.computeIfAbsent(timeOfDay, k -> new ArrayList<>());
     }
 
     public void printTimetable() {
@@ -73,8 +52,7 @@ public class Timetable {
             listCounterOfTrainings.add(counterOfTrainings);
         }
 
-        Collections.sort(listCounterOfTrainings);
-        Collections.reverse(listCounterOfTrainings);
+        listCounterOfTrainings.sort(Comparator.reverseOrder());
         return listCounterOfTrainings;
 
     }
