@@ -18,10 +18,6 @@ public class TrainingSession {
         this.timeOfDay = timeOfDay;
     }
 
-    public Group getGroup() {
-        return group;
-    }
-
     public Coach getCoach() {
         return coach;
     }
@@ -32,5 +28,10 @@ public class TrainingSession {
 
     public TimeOfDay getTimeOfDay() {
         return timeOfDay;
+    }
+
+    @Override
+    public String toString() {
+        return group + " " + coach + " " + dayOfWeek + " " + timeOfDay;
     }
 }

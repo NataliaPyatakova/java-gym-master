@@ -4,17 +4,67 @@ import java.util.*;
 
 public class Timetable {
 
-    private /* как это хранить??? */ timetable;
+    private final HashMap<DayOfWeek, TreeMap<TimeOfDay, ArrayList<TrainingSession>>> timetable = new HashMap<>();
 
     public void addNewTrainingSession(TrainingSession trainingSession) {
-        //сохраняем занятие в расписании
+        TreeMap<TimeOfDay, ArrayList<TrainingSession>> trainingsForDay = timetable.computeIfAbsent(trainingSession.getDayOfWeek(), k -> new TreeMap<>());
+        ArrayList<TrainingSession> sessions = trainingsForDay.computeIfAbsent(trainingSession.getTimeOfDay(), k -> new ArrayList<>());
+        sessions.add(trainingSession);
     }
 
-    public /* непонятно, что возвращать */ getTrainingSessionsForDay(DayOfWeek dayOfWeek) {
-        //как реализовать, тоже непонятно, но сложность должна быть О(1)
+    public TreeMap<TimeOfDay, ArrayList<TrainingSession>> getTrainingSessionsForDay(DayOfWeek dayOfWeek) {
+        TreeMap<TimeOfDay, ArrayList<TrainingSession>> trainingSessionTreeMap;
+        if (timetable.containsKey(dayOfWeek)) {
+            trainingSessionTreeMap = timetable.get(dayOfWeek);
+        } else {
+            trainingSessionTreeMap = new TreeMap<>();
+        }
+        return trainingSessionTreeMap;
     }
 
-    public /* непонятно, что возвращать */ getTrainingSessionsForDayAndTime(DayOfWeek dayOfWeek, TimeOfDay timeOfDay) {
-        //как реализовать, тоже непонятно, но сложность должна быть О(1)
+    public ArrayList<TrainingSession> getTrainingSessionsForDayAndTime(DayOfWeek dayOfWeek, TimeOfDay timeOfDay) {
+        ArrayList<TrainingSession> trainingSessionArrayList;
+        if (timetable.containsKey(dayOfWeek) && timetable.get(dayOfWeek).containsKey(timeOfDay)) {
+            trainingSessionArrayList = timetable.get(dayOfWeek).get(timeOfDay);
+        } else {
+            trainingSessionArrayList = new ArrayList<>();
+        }
+        return trainingSessionArrayList;
+    }
+
+    public void printTimetable() {
+        for (DayOfWeek dayOfWeek : timetable.keySet()) {
+            System.out.println(dayOfWeek);
+            for (Map.Entry<TimeOfDay, ArrayList<TrainingSession>> entry : timetable.get(dayOfWeek).entrySet()) {
+                System.out.println(entry.getKey());
+                for (TrainingSession trainingSession : entry.getValue()) {
+                    System.out.println(trainingSession);
+                }
+            }
+        }
+    }
+
+    public ArrayList<CounterOfTrainings> getCountByCoaches() {
+        HashMap<Coach, Integer> countByCoaches = new HashMap<>();
+        ArrayList<CounterOfTrainings> listCounterOfTrainings = new ArrayList<>();
+        for (DayOfWeek dayOfWeek : timetable.keySet()) {
+            for (Map.Entry<TimeOfDay, ArrayList<TrainingSession>> entry : timetable.get(dayOfWeek).entrySet()) {
+                for (TrainingSession trainingSession : entry.getValue()) {
+                    if (countByCoaches.containsKey(trainingSession.getCoach())) {
+                        countByCoaches.put(trainingSession.getCoach(), countByCoaches.get(trainingSession.getCoach()) + 1);
+                    } else {
+                        countByCoaches.put(trainingSession.getCoach(), 1);
+                    }
+                }
+            }
+        }
+        for (Map.Entry<Coach, Integer> entry : countByCoaches.entrySet()) {
+            CounterOfTrainings counterOfTrainings = new CounterOfTrainings(entry.getKey(), entry.getValue());
+            listCounterOfTrainings.add(counterOfTrainings);
+        }
+
+        listCounterOfTrainings.sort(Comparator.reverseOrder());
+        return listCounterOfTrainings;
+
     }
 }
